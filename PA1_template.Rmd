@@ -1,25 +1,133 @@
 ---
 title: "Reproducible Research: Peer Assessment 1"
+author: "Author: Hendrik L., Switzerland"
+date: "Date of Creation: `r Sys.Date()`"
 output: 
   html_document:
     keep_md: true
+    
 ---
 
+```{r setoptions, echo=FALSE, results='hide', message=FALSE}
+# knitr library for processing the present R markdown
+library(knitr)
+opts_chunk$set(echo = FALSE, results = "hide", cache = TRUE)
 
-## Loading and preprocessing the data
+# stringr library for enhanced string manipulation
+library(stringr)
+
+# lubridate library for enhanced date-time-manipulation
+library(lubridate)
+
+# dplyr + tidyr library for advanced data manipulation
+library(dplyr)
+library(tidyr)
+
+# Cairo library for better anti-aliasing of png-graphics
+library(Cairo)
+```
+
+-----   
+   
+### General description
+Based on some data created by a devices belonging to the "quantified self"
+movement, the following report from August 2015 shows research results 
+according to the Peer Assessment 1 assignment of the JHU/Coursera course 
+"Reproducible Research".
+
+The complete assignment can be found here: [Link](https://class.coursera.org/repdata-031/human_grading/view/courses/975144/assessments/3/submissions)
+
+-----   
+
+### Loading the data
+```{r, echo=TRUE, results='markup'}
+actZipFilepath <- "./activity.zip"
+actFilename <- "activity.csv"
+actData <- read.csv(unz(actZipFilepath, actFilename))
+```
+
+### Preprocessing the data
+```{r, echo=TRUE, results='markup'}
+# reformat date and time data according to Posix standard
+tempDate <- actData$date
+
+# fill up the intervall with zeros
+tempIntv <- str_pad(actData$interval, 4, pad = "0")
+tempDateIntv <- paste(tempDate, tempIntv)
+
+# create date and interval start time according to POSIXct standard
+actData <- cbind(actData[1], strptime(tempDateIntv, "%Y-%m-%d %H%M"))
+names(actData)[ncol(actData)] <- "date_interval"
+```
+
+### Create a histogram of total daily steps
+```{r, echo=TRUE, results='markup'}
+# calculate the total daily steps
+actDataTemp <- actData %>%
+    separate(col = date_interval, into = c("date", "intervallStartTime"), sep = " ") %>%
+    select(date, steps) %>%
+    group_by(date)
+
+actDataNaRemoved <- actDataTemp %>%
+    filter(!is.na(steps)) %>%
+    summarize(totalSteps = sum(steps))
+
+actDataUnique <- actDataTemp %>%
+    summarize(totalSteps = sum(steps))
 
 
+# calculate the range of total daily steps, for this, replace NAs with zeros
+cleanedTotalSteps <- actDataNaRemoved$totalSteps
+ok <- !is.na(cleanedTotalSteps)
+cleanedTotalSteps[!ok] <- 0
+rangeCeiling <- abs((max(cleanedTotalSteps)/5000) + 1) * 5000
+rangeTotalSteps <- c(min(cleanedTotalSteps), rangeCeiling)
 
-## What is mean total number of steps taken per day?
+# plot the histogram
+Cairo(file = "histottnostepsperday.png", type = "png", bg = "white")
+hist(actDataNaRemoved$totalSteps, col = "green", breaks = 25, 
+    main = "Histogram of total daily steps",
+    xlab = "No. of total daily steps",
+    xlim = rangeTotalSteps)
+```
 
+### Mean of the no. of total daily steps
+```{r, echo=FALSE, results='markup'}
+# calculate the mean of total daily steps
+meanTotalSteps <- abs(mean(actDataNaRemoved$totalSteps))
+print(meanTotalSteps)
+```
 
+### Median of the no. of total daily steps
+```{r, echo=FALSE, results='markup'}
+# calculate the median of total daily steps
+medianTotalSteps <- median(actDataNaRemoved$totalSteps)
+print(medianTotalSteps)
+```
 
-## What is the average daily activity pattern?
+    
+## What is the average daily act pattern?
+```{r}
+
+```
 
 
 
 ## Imputing missing values
+```{r}
+
+```
 
 
 
-## Are there differences in activity patterns between weekdays and weekends?
+## Are there differences in act patterns between weekdays and weekends?
+```{r}
+
+```
+
+
+```{r}
+# finalization
+# closeAllConnections()
+```
+
