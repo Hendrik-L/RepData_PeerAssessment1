@@ -195,6 +195,7 @@ hist(actDataTemp$totalSteps, col = "green", breaks = rangeCeiling/1000,
 2. The median values is now equal to the mean value.
 3. The highest no. of daiy steps in the histogram (i.e., the bar that shows 10,000 to 11,000 steps) grew significantly.
 
+
 &nbsp;
 
 ### Are there differences in act patterns between weekdays and weekends?
